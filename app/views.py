@@ -11,6 +11,15 @@ from app.models import Conversation
 from app.models import Mutation
 
 @csrf_exempt
+def reset(request):
+    Mutation.objects.all().delete()
+    Conversation.objects.all().delete()
+    return JsonResponse({
+        "ok": True,
+        "msg": "Database cleaned up of all Conversations and Mutations",
+    })
+
+@csrf_exempt
 def ping(request):
     return JsonResponse({
         "ok": True,
@@ -149,18 +158,17 @@ def mutations(request):
                             "msg": "Origin outside conversation boundaries",
                         }, status=201)
                     mutation = _operational_transfrosmation(old_mutation, mutation)
-            else:
-                last_mutation = Mutation.objects.filter(
-                    conversation=conversation).last()
-                if last_mutation:
-                    expected_origin = last_mutation.origin.copy()
-                    expected_origin[last_mutation.author] += 1
-                    if expected_origin != origin:
-                        return JsonResponse({
-                            "ok": False,
-                            "msg": "Origin outside conversation boundaries",
-                        }, status=201)
-                    mutation.origin[author] += 1
+            # else:
+            #     last_mutation = Mutation.objects.filter(
+            #         conversation=conversation).last()
+            #     if last_mutation:
+            #         expected_origin = last_mutation.origin.copy()
+            #         expected_origin[last_mutation.author] += 1
+            #         if expected_origin != origin:
+            #             return JsonResponse({
+            #                 "ok": False,
+            #                 "msg": "Origin outside conversation boundaries",
+            #             }, status=201)
 
             new_text = _apply_mutation(mutation, conversation.text)
             conversation.text = new_text

@@ -8,6 +8,7 @@ from app import views
 
 urlpatterns = [
     re_path('admin/', admin.site.urls),
+    re_path('reset/?$', views.reset, name="reset"),
     re_path('ping/?$', views.ping, name="ping"),
     re_path('info/?$', views.info, name="info"),
     re_path('mutations/?$', views.mutations, name="mutations"),
