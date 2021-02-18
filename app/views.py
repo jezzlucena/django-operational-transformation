@@ -133,14 +133,14 @@ def mutations(request):
 
             conflict_origin = origin.copy()
             conflict_origin[author] -= 1
-            conflicting_mutation = Mutation.objects.filter(
+            conflict_mutation = Mutation.objects.filter(
                 conversation=conversation,
-                origin__contains=).first()
+                origin__contains=conflict_origin).first()
 
-            if conflicting_mutation is not None:
+            if conflict_mutation is not None:
                 all_conflicts = Mutation.objects.filter(
                     conversation=conversation,
-                    id__gt=conflicting_mutation.id)
+                    id__gt=conflict_mutation.id)
 
                 for old_mutation in all_conflicts:
                     if old_mutation.origin != mutation.origin:
