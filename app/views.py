@@ -6,7 +6,7 @@ from django.http import HttpResponseNotAllowed
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
-db = {
+local_db = {
     "conversations": {},
     "all_mutations": []
 }
@@ -112,13 +112,13 @@ def mutations(request):
             data = parsed_data.get("data")
             origin = parsed_data.get("origin")
 
-            if conversation_id not in db["conversations"].keys():
-                db["conversations"][conversation_id] = {
+            if conversation_id not in local_db["conversations"].keys():
+                local_db["conversations"][conversation_id] = {
                     "text": "",
                     "last_mutation": None,
                 }
 
-            conversation = db["conversations"].get(conversation_id)
+            conversation = local_db["conversations"].get(conversation_id)
             last_mutation = conversation.get("last_mutation")
             text = conversation.get("text")
             
@@ -165,7 +165,7 @@ def mutations(request):
                 raise Exception("Invalid mutation type or index")
 
             conversation["last_mutation"] = mutation
-            db["all_mutations"].append(mutation)
+            local_db["all_mutations"].append(mutation)
 
             return JsonResponse({
                 "ok": True,
@@ -188,14 +188,14 @@ def conversations(request):
             "id": c["last_mutation"],
             "lastMutation": c["last_mutation"],
             "lastMutation": c["last_mutation"],
-        } for c in db["conversations"]]
+        } for c in local_db["conversations"]]
         return JsonResponse({
             "conversations": conversations,
             "ok": True,
         })
     elif request.method == 'DELETE':
         try:
-            db["conversations"].pop(request.DELETE.get("conversation_id"))
+            local_db["conversations"].pop(request.DELETE.get("conversation_id"))
         except:
             return JsonResponse({
                 "msg": "Conversation not found", 
