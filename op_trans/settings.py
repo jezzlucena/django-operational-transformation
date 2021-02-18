@@ -14,8 +14,6 @@ import django_heroku
 
 from pathlib import Path
 
-APPEND_SLASH = False
-
 CORS_ALLOW_METHODS = [
     'DELETE',
     'GET',
