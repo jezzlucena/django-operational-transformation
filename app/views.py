@@ -131,20 +131,22 @@ def mutations(request):
                 "at",
                 data.get("index"))
 
-            conflict_origin = origin.copy()
-            conflict_origin[author] -= 1
             conflict_mutation = Mutation.objects.filter(
                 conversation=conversation,
-                origin__contains=conflict_origin).first()
+                origin__contains=origin).first()
 
             if conflict_mutation is not None:
-                all_conflicts = Mutation.objects.filter(
+                conflict_candidates = Mutation.objects.filter(
                     conversation=conversation,
                     id__gt=conflict_mutation.id)
+                all_conflicts = [conflict_mutation] + list(conflict_candidates)
 
                 for old_mutation in all_conflicts:
                     if old_mutation.origin != mutation.origin:
-                        raise Exception("Broken mutation stack")
+                        return JsonResponse({
+                            "ok": False,
+                            "text": conversation.text,
+                        }, status=201)
                     mutation = _operational_transfrosmation(old_mutation, mutation)
             # else:
             #     last_mutation = Mutation.objects.filter(
@@ -201,7 +203,7 @@ def conversations(request):
             return JsonResponse({
                 "msg": "Conversation not found", 
                 "ok": False,
-            }, status=400)
+            }, status=200)
         
         return JsonResponse({
             "ok": True,
