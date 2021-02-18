@@ -42,7 +42,6 @@ def info(request):
 def _apply_mutation(mutation, text):
     data = mutation.data
     index = int(data["index"])
-    print(len(text), index, data.get("length"))
     if data.get("type") == "insert" and len(text) >= index:
         return text[:index] + data["text"] + text[index:]
     elif data.get("type") == "delete" and len(text) >= index + data.get("length"):
@@ -96,10 +95,13 @@ def mutations(request):
     if request.method == 'POST':
         try:
             parsed_data = json.loads(request.body)
-            conversation_id = parsed_data.get("conversationId")
+            conversation_id = parsed_data.get("conversationId", None)
             author = parsed_data.get("author")
             data = parsed_data.get("data")
             origin = parsed_data.get("origin")
+
+            if not conversation_id:
+                raise Exception("invalid conversation ID")
 
             conversation, _ = Conversation.objects.get_or_create(identifier=conversation_id)
             
@@ -178,7 +180,7 @@ def conversations(request):
                     "author": last_mutation.author,
                     "data": last_mutation.data,
                     "origin": last_mutation.origin,
-                },
+                } if last_mutation else None,
             } for c in conversations]
         return JsonResponse({
             "conversations": results,
@@ -186,7 +188,7 @@ def conversations(request):
         })
     elif request.method == 'DELETE':
         try:
-            Conversation.objects.get(identifier=request.DELETE.get("conversation_id"))
+            Conversation.objects.get(identifier=request.DELETE.get("conversationId"))
         except Exception as err:
             print(traceback.format_exc())
             return JsonResponse({
