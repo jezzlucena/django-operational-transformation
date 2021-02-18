@@ -1,1 +1,1 @@
-web: gunicorn op_trans.wsgi --log-file -
+web: gunicorn app.wsgi --log-file -
