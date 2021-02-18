@@ -44,10 +44,16 @@ ALLOWED_HOSTS = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "https://example.com",
-    "https://sub.example.com",
-    "http://localhost:8080",
-    "http://127.0.0.1:9000"
+    "https://127.0.0.1",
+    "https://localhost",
+    "https://app.ava.me",
+    "https://avahq.github.io",
+    "https://ava-challenge-test-backend.herokuapp.com",
+    "http://127.0.0.1",
+    "http://localhost",
+    "http://app.ava.me",
+    "http://avahq.github.io",
+    "http://ava-challenge-test-backend.herokuapp.com",
 ]
 
 # Application definition
