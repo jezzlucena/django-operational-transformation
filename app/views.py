@@ -170,7 +170,7 @@ def mutations(request):
             return JsonResponse({
                 "msg": err.args[0] if err.args else "Unknown error",
                 "ok": False,
-            }, status=201)
+            }, status=400)
 
     return HttpResponseNotAllowed(['POST'])
 
@@ -203,7 +203,7 @@ def conversations(request):
             return JsonResponse({
                 "msg": "Conversation not found", 
                 "ok": False,
-            }, status=404)
+            }, status=400)
         
         return JsonResponse({
             "ok": True,
