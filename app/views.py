@@ -131,21 +131,28 @@ def mutations(request):
                 "at",
                 data.get("index"))
 
+            conflict_origin = origin.copy()
+            conflict_origin[author] -= 1
             conflicting_mutation = Mutation.objects.filter(
                 conversation=conversation,
-                origin__contains=origin).first()
+                origin__contains=).first()
 
             if conflicting_mutation is not None:
-                subsequent_mutations = Mutation.objects.filter(
+                all_conflicts = Mutation.objects.filter(
                     conversation=conversation,
                     id__gt=conflicting_mutation.id)
-                all_conflicts = [conflicting_mutation] + list(subsequent_mutations)
 
                 for old_mutation in all_conflicts:
                     if old_mutation.origin != mutation.origin:
                         raise Exception("Broken mutation stack")
                     mutation = _operational_transfrosmation(old_mutation, mutation)
-            
+            # else:
+            #     last_mutation = Mutation.objects.filter(
+            #         conversation=conversation).last()
+            #     if last_mutation:
+            #         mutation.origin = last_mutation.origin
+            #         mutation.origin[last_mutation.author] += 1
+
             new_text = _apply_mutation(mutation, conversation.text)
             conversation.text = new_text
 
