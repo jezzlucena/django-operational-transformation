@@ -1,3 +1,5 @@
+import json
+
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -34,4 +36,4 @@ class Mutation(BaseModel):
         abstract = False
 
     def __str__(self):
-        return "%s %s %s" % (self.id, self.author, self.origin)
+        return "author: %s, origin: %s" % (self.author, json.dumps(self.origin))

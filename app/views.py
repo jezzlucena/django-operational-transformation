@@ -140,25 +140,43 @@ def mutations(request):
                 "at",
                 data.get("index"))
 
-            conflict_mutation = Mutation.objects.filter(
-                conversation=conversation,
-                origin__contains=origin).first()
+            last_mutation = Mutation.objects.filter(
+                conversation=conversation).last()
+            if last_mutation is not None:
+                conflict_origin = origin.copy()
+                if conflict_origin[author] > 0:
+                    conflict_origin[author] -= 1
+                
+                if conflict_origin == last_mutation.origin:
+                    mutation.origin = conflict_origin
+                    mutation = _operational_transfrosmation(last_mutation, mutation)
+                else:
+                    conflict_mutation = Mutation.objects.filter(
+                        conversation=conversation,
+                        origin__contains=conflict_origin).first()
 
-            if conflict_mutation is not None:
-                conflict_candidates = Mutation.objects.filter(
-                    conversation=conversation,
-                    id__gt=conflict_mutation.id)
-                all_conflicts = [conflict_mutation] + list(conflict_candidates)
+                    if conflict_mutation is not None:
+                        mutation.origin = conflict_origin
+                        conflict_candidates = Mutation.objects.filter(
+                            conversation=conversation,
+                            id__gt=conflict_mutation.id)
+                        all_conflicts = [conflict_mutation] + list(conflict_candidates)
 
-                for old_mutation in all_conflicts:
-                    if old_mutation.origin != mutation.origin:
-                        return JsonResponse({
-                            "ok": False,
-                            "text": conversation.text,
-                            "msg": "Origin outside conversation boundaries",
-                        }, status=201)
-                    mutation = _operational_transfrosmation(old_mutation, mutation)
-            # else:
+                        for old_mutation in all_conflicts:
+                            # if old_mutation.origin != mutation.origin:
+                            #     return JsonResponse({
+                            #         "ok": False,
+                            #         "text": conversation.text,
+                            #         "msg": "Origin outside conversation boundaries",
+                            #     }, status=201)
+                            mutation = _operational_transfrosmation(old_mutation, mutation)
+                            print(mutation.origin)
+            elif not all(v == 0 for v in origin.values()):
+                return JsonResponse({
+                    "ok": False,
+                    "msg": "Origin outside conversation boundaries",
+                }, status=201)
+
             #     last_mutation = Mutation.objects.filter(
             #         conversation=conversation).last()
             #     if last_mutation:
