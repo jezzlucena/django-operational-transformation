@@ -106,6 +106,7 @@ def _operational_transfrosmation(last_mutation, current_mutation):
 def mutations(request):
     print(request.body)
     if request.method == 'POST':
+        try:
             parsed_data = json.loads(request.body)
             conversation_id = parsed_data.get("conversationId")
             author = parsed_data.get("author")
