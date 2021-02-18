@@ -105,79 +105,73 @@ def _operational_transfrosmation(last_mutation, current_mutation):
 @csrf_exempt
 def mutations(request):
     if request.method == 'POST':
-        try:
-            parsed_data = json.loads(request.body)
-            conversation_id = parsed_data.get("conversationId")
-            author = parsed_data.get("author")
-            data = parsed_data.get("data")
-            origin = parsed_data.get("origin")
+        print(request.body)
+        parsed_data = json.loads(request.body)
+        conversation_id = parsed_data.get("conversationId")
+        author = parsed_data.get("author")
+        data = parsed_data.get("data")
+        origin = parsed_data.get("origin")
 
-            if conversation_id not in local_db["conversations"].keys():
-                local_db["conversations"][conversation_id] = {
-                    "conversation_id": conversation_id,
-                    "text": "",
-                    "last_mutation": None,
-                }
-
-            conversation = local_db["conversations"].get(conversation_id)
-            last_mutation = conversation.get("last_mutation")
-            text = conversation.get("text")
-            
-            data_length = data.get("length", None)
-            data_text = data.get("text", None)
-            mutation = {
-                "author": author,
-                "data": {
-                    "index": int(data.get("index")),
-                    "type": data.get("type")
-                },
-                "origin": {
-                    "alice": int(origin.get("alice")),
-                    "bob": int(origin.get("bob")),
-                },
+        if conversation_id not in local_db["conversations"].keys():
+            local_db["conversations"][conversation_id] = {
+                "conversation_id": conversation_id,
+                "text": "",
+                "last_mutation": None,
             }
 
-            if data_length is not None:
-                mutation["data"]["length"] = data_length
+        conversation = local_db["conversations"].get(conversation_id)
+        last_mutation = conversation.get("last_mutation")
+        text = conversation.get("text")
+        
+        data_length = data.get("length", None)
+        data_text = data.get("text", None)
+        mutation = {
+            "author": author,
+            "data": {
+                "index": int(data.get("index")),
+                "type": data.get("type")
+            },
+            "origin": {
+                "alice": int(origin.get("alice")),
+                "bob": int(origin.get("bob")),
+            },
+        }
 
-            if data_text is not None:
-                mutation["data"]["text"] = data_text
+        if data_length is not None:
+            mutation["data"]["length"] = data_length
 
-            print(author,
-                data.get("type")+"s",
-                "\""+str(data.get("text") if data["type"] == "insert" else data.get("length"))+"\"",
-                "at",
-                data.get("index"))
+        if data_text is not None:
+            mutation["data"]["text"] = data_text
 
-            if last_mutation is not None:
-                mutation = _operational_transfrosmation(last_mutation, mutation)
-            else:
-                for key in origin.keys():
-                    if origin[key] != 0:
-                        raise Exception("Invalid mutation, bad origin for given conversation")
+        print(author,
+            data.get("type")+"s",
+            "\""+str(data.get("text") if data["type"] == "insert" else data.get("length"))+"\"",
+            "at",
+            data.get("index"))
 
-            index = int(mutation["data"]["index"])
-            if data.get("type") == "insert" and len(text) >= data.get("index"):
-                conversation["text"] = text[:index] + mutation["data"]["text"] + text[index:]
-            elif data.get("type") == "delete" and len(text) >= data.get("index")+data.get("length"):
-                length = int(mutation["data"]["length"])
-                conversation["text"] = text[:index] + text[index+length:]
-            else:
-                raise Exception("Invalid mutation type or index")
+        if last_mutation is not None:
+            mutation = _operational_transfrosmation(last_mutation, mutation)
+        else:
+            for key in origin.keys():
+                if origin[key] != 0:
+                    raise Exception("Invalid mutation, bad origin for given conversation")
 
-            conversation["last_mutation"] = mutation
-            local_db["all_mutations"].append(mutation)
+        index = int(mutation["data"]["index"])
+        if data.get("type") == "insert" and len(text) >= data.get("index"):
+            conversation["text"] = text[:index] + mutation["data"]["text"] + text[index:]
+        elif data.get("type") == "delete" and len(text) >= data.get("index")+data.get("length"):
+            length = int(mutation["data"]["length"])
+            conversation["text"] = text[:index] + text[index+length:]
+        else:
+            raise Exception("Invalid mutation type or index")
 
-            return JsonResponse({
-                "ok": True,
-                "text": conversation["text"],
-            }, status=201)
-        except Exception as err:
-            return JsonResponse({
-                "msg": err.args[0] if err.args else "Unknown error",
-                "ok": False,
-                "text": text,
-            }, status=400)
+        conversation["last_mutation"] = mutation
+        local_db["all_mutations"].append(mutation)
+
+        return JsonResponse({
+            "ok": True,
+            "text": conversation["text"],
+        }, status=201)
 
     return HttpResponseNotAllowed(['POST'])
 
