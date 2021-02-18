@@ -1,1 +1,1 @@
-web: web: python op_trans/manage.py collectstatic --noinput; gunicorn op_trans.wsgi --log-file -
+web: python manage.py collectstatic --noinput; gunicorn op_trans.wsgi --log-file -
