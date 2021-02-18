@@ -147,7 +147,11 @@ def mutations(request):
                         is_invalid_mutation = True
 
             if is_invalid_mutation:
-                raise Exception("Invalid mutation: wrong origin for this conversation")
+                return JsonResponse({
+                    "ok": False,
+                    "text": conversation.text,
+                    "msg": "Invalid mutation: wrong origin for this conversation",
+                }, status=201)
 
             index = int(mutation.data["index"])
             if data.get("type") == "insert" and len(text) >= data.get("index"):
