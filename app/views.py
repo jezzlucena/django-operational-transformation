@@ -61,7 +61,6 @@ def _operational_transfrosmation(last_mutation, current_mutation):
     new_mutation = Mutation(
         author=current_mutation.author,
         conversation=current_mutation.conversation,
-        text=current_mutation.text,
         data=current_mutation.data.copy(),
         origin=current_mutation.origin.copy())
 
@@ -144,11 +143,9 @@ def mutations(request):
                     if old_mutation.origin != mutation.origin:
                         raise Exception("Broken mutation stack")
                     mutation = _operational_transfrosmation(old_mutation, mutation)
-                    print(mutation.data, mutation.origin)
             
             new_text = _apply_mutation(mutation, conversation.text)
             conversation.text = new_text
-            mutation.text = new_text
 
             mutation.save()
             conversation.save()
