@@ -27,6 +27,7 @@ class Conversation(BaseModel):
 class Mutation(BaseModel):
     author = models.CharField(max_length=5, choices=AuthorEnum.choices, default=AuthorEnum.BOB)
     conversation = models.ForeignKey('Conversation', on_delete=models.CASCADE)
+    text = models.TextField(default="")
     data = models.JSONField()
     origin = models.JSONField()
 
