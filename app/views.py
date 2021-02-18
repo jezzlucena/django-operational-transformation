@@ -104,74 +104,79 @@ def _operational_transfrosmation(last_mutation, current_mutation):
 
 @csrf_exempt
 def mutations(request):
+    print(request.body)
     if request.method == 'POST':
-        print(request.body)
-        parsed_data = json.loads(request.body)
-        conversation_id = parsed_data.get("conversationId")
-        author = parsed_data.get("author")
-        data = parsed_data.get("data")
-        origin = parsed_data.get("origin")
+            parsed_data = json.loads(request.body)
+            conversation_id = parsed_data.get("conversationId")
+            author = parsed_data.get("author")
+            data = parsed_data.get("data")
+            origin = parsed_data.get("origin")
 
-        if conversation_id not in local_db["conversations"].keys():
-            local_db["conversations"][conversation_id] = {
-                "conversation_id": conversation_id,
-                "text": "",
-                "last_mutation": None,
+            if conversation_id not in local_db["conversations"].keys():
+                local_db["conversations"][conversation_id] = {
+                    "conversation_id": conversation_id,
+                    "text": "",
+                    "last_mutation": None,
+                }
+
+            conversation = local_db["conversations"].get(conversation_id)
+            last_mutation = conversation.get("last_mutation")
+            text = conversation.get("text")
+            
+            data_length = data.get("length", None)
+            data_text = data.get("text", None)
+            mutation = {
+                "author": author,
+                "data": {
+                    "index": int(data.get("index")),
+                    "type": data.get("type")
+                },
+                "origin": {
+                    "alice": int(origin.get("alice")),
+                    "bob": int(origin.get("bob")),
+                },
             }
 
-        conversation = local_db["conversations"].get(conversation_id)
-        last_mutation = conversation.get("last_mutation")
-        text = conversation.get("text")
-        
-        data_length = data.get("length", None)
-        data_text = data.get("text", None)
-        mutation = {
-            "author": author,
-            "data": {
-                "index": int(data.get("index")),
-                "type": data.get("type")
-            },
-            "origin": {
-                "alice": int(origin.get("alice")),
-                "bob": int(origin.get("bob")),
-            },
-        }
+            if data_length is not None:
+                mutation["data"]["length"] = data_length
 
-        if data_length is not None:
-            mutation["data"]["length"] = data_length
+            if data_text is not None:
+                mutation["data"]["text"] = data_text
 
-        if data_text is not None:
-            mutation["data"]["text"] = data_text
+            print(author,
+                data.get("type")+"s",
+                "\""+str(data.get("text") if data["type"] == "insert" else data.get("length"))+"\"",
+                "at",
+                data.get("index"))
 
-        print(author,
-            data.get("type")+"s",
-            "\""+str(data.get("text") if data["type"] == "insert" else data.get("length"))+"\"",
-            "at",
-            data.get("index"))
+            if last_mutation is not None:
+                mutation = _operational_transfrosmation(last_mutation, mutation)
+            else:
+                for key in origin.keys():
+                    if origin[key] != 0:
+                        raise Exception("Invalid mutation, bad origin for given conversation")
 
-        if last_mutation is not None:
-            mutation = _operational_transfrosmation(last_mutation, mutation)
-        else:
-            for key in origin.keys():
-                if origin[key] != 0:
-                    raise Exception("Invalid mutation, bad origin for given conversation")
+            index = int(mutation["data"]["index"])
+            if data.get("type") == "insert" and len(text) >= data.get("index"):
+                conversation["text"] = text[:index] + mutation["data"]["text"] + text[index:]
+            elif data.get("type") == "delete" and len(text) >= data.get("index")+data.get("length"):
+                length = int(mutation["data"]["length"])
+                conversation["text"] = text[:index] + text[index+length:]
+            else:
+                raise Exception("Invalid mutation type or index")
 
-        index = int(mutation["data"]["index"])
-        if data.get("type") == "insert" and len(text) >= data.get("index"):
-            conversation["text"] = text[:index] + mutation["data"]["text"] + text[index:]
-        elif data.get("type") == "delete" and len(text) >= data.get("index")+data.get("length"):
-            length = int(mutation["data"]["length"])
-            conversation["text"] = text[:index] + text[index+length:]
-        else:
-            raise Exception("Invalid mutation type or index")
+            conversation["last_mutation"] = mutation
+            local_db["all_mutations"].append(mutation)
 
-        conversation["last_mutation"] = mutation
-        local_db["all_mutations"].append(mutation)
-
-        return JsonResponse({
-            "ok": True,
-            "text": conversation["text"],
-        }, status=201)
+            return JsonResponse({
+                "ok": True,
+                "text": conversation["text"],
+            }, status=201)
+        except Exception as err:
+            return JsonResponse({
+                "msg": err.args[0] if err.args else "Unknown error",
+                "ok": False,
+            }, status=201)
 
     return HttpResponseNotAllowed(['POST'])
 
