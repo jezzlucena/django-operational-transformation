@@ -146,14 +146,20 @@ def mutations(request):
                         return JsonResponse({
                             "ok": False,
                             "text": conversation.text,
+                            "msg": "Origin outside conversation boundaries",
                         }, status=201)
                     mutation = _operational_transfrosmation(old_mutation, mutation)
-            # else:
-            #     last_mutation = Mutation.objects.filter(
-            #         conversation=conversation).last()
-            #     if last_mutation:
-            #         mutation.origin = last_mutation.origin
-            #         mutation.origin[last_mutation.author] += 1
+            else:
+                last_mutation = Mutation.objects.filter(
+                    conversation=conversation).last()
+                if last_mutation:
+                    expected_origin = last_mutation.origin.copy()
+                    expected_origin[last_mutation.author] += 1
+                    if expected_origin != origin:
+                        return JsonResponse({
+                            "ok": False,
+                            "msg": "Origin outside conversation boundaries",
+                        }, status=201)
 
             new_text = _apply_mutation(mutation, conversation.text)
             conversation.text = new_text
