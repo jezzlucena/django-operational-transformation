@@ -105,7 +105,7 @@ def _operational_transfrosmation(last_mutation, current_mutation):
 @csrf_exempt
 def mutations(request):
     if request.method == 'POST':
-        # try:
+        try:
             parsed_data = json.loads(request.body)
             conversation_id = parsed_data.get("conversationId")
             author = parsed_data.get("author")
@@ -171,7 +171,7 @@ def mutations(request):
                 "ok": True,
                 "text": conversation["text"],
             }, status=201)
-        # except Exception as err:
+        except Exception as err:
             return JsonResponse({
                 "msg": err.args[0] if err.args else "Unknown error",
                 "ok": False,
