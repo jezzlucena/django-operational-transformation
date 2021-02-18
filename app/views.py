@@ -84,7 +84,7 @@ def mutations(request):
         try:
             parsed_data = json.loads(request.body)
             print("TESTING PARSING OF BODY")
-            print(body)
+            print(request.body)
             print(parsed_data)
             print(parsed_data.get("conversationId"))
             print("TESTING PARSING OF BODY")
