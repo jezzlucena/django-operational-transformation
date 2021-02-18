@@ -25,7 +25,7 @@ SECRET_KEY = 'umtt1()s^l-)*z^8))sz$%mmsa$*!7wt9ahkpict2c3o0d9u@y'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost"]
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", "app.ava.me"]
 
 
 # Application definition
