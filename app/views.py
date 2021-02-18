@@ -160,6 +160,7 @@ def mutations(request):
                             "ok": False,
                             "msg": "Origin outside conversation boundaries",
                         }, status=201)
+                    mutation.origin[author] += 1
 
             new_text = _apply_mutation(mutation, conversation.text)
             conversation.text = new_text
