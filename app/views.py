@@ -114,6 +114,7 @@ def mutations(request):
 
             if conversation_id not in local_db["conversations"].keys():
                 local_db["conversations"][conversation_id] = {
+                    "conversation_id": conversation_id,
                     "text": "",
                     "last_mutation": None,
                 }
@@ -186,9 +187,9 @@ def conversations(request):
     if request.method == 'GET':
         conversations = [{
             "id": c["last_mutation"],
+            "text": c["text"],
             "lastMutation": c["last_mutation"],
-            "lastMutation": c["last_mutation"],
-        } for c in local_db["conversations"]]
+        } for c in local_db["conversations"].values()]
         return JsonResponse({
             "conversations": conversations,
             "ok": True,
