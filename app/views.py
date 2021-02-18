@@ -105,7 +105,7 @@ def _operational_transfrosmation(last_mutation, current_mutation):
 @csrf_exempt
 def mutations(request):
     if request.method == 'POST':
-        try:
+        # try:
             parsed_data = json.loads(request.body)
             conversation_id = parsed_data.get("conversationId")
             author = parsed_data.get("author")
@@ -122,12 +122,12 @@ def mutations(request):
             last_mutation = conversation.get("last_mutation")
             text = conversation.get("text")
             
+            data_length = data.get("length", None)
+            data_text = data.get("text", None)
             mutation = {
                 "author": author,
                 "data": {
                     "index": int(data.get("index")),
-                    "length": int(data.get("length", None)),
-                    "text": data.get("text", None),
                     "type": data.get("type")
                 },
                 "origin": {
@@ -135,6 +135,12 @@ def mutations(request):
                     "bob": int(origin.get("bob")),
                 },
             }
+
+            if data_length is not None:
+                mutation["data"]["length"] = data_length
+
+            if data_text is not None:
+                mutation["data"]["text"] = data_text
 
             print(author,
                 data.get("type")+"s",
@@ -165,7 +171,7 @@ def mutations(request):
                 "ok": True,
                 "text": conversation["text"],
             }, status=201)
-        except Exception as err:
+        # except Exception as err:
             return JsonResponse({
                 "msg": err.args[0] if err.args else "Unknown error",
                 "ok": False,
