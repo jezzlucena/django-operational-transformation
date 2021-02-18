@@ -1,3 +1,7 @@
 from django.contrib import admin
 
-# Register your models here.
+from app.models import Conversation
+from app.models import Mutation
+
+admin.site.register(Conversation)
+admin.site.register(Mutation)
