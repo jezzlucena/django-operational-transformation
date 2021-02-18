@@ -186,7 +186,7 @@ def mutations(request):
 def conversations(request):
     if request.method == 'GET':
         conversations = [{
-            "id": c["last_mutation"],
+            "id": c["conversation_id"],
             "text": c["text"],
             "lastMutation": c["last_mutation"],
         } for c in local_db["conversations"].values()]
