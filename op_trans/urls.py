@@ -12,4 +12,5 @@ urlpatterns = [
     re_path('info/?$', views.info, name="info"),
     re_path('mutations/?$', views.mutations, name="mutations"),
     re_path('conversations/?$', views.conversations, name="conversations"),
+    re_path('/?$', views.info, name="home"),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

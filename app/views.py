@@ -83,6 +83,11 @@ def mutations(request):
     if request.method == 'POST':
         try:
             parsed_data = json.loads(request.body)
+            print("TESTING PARSING OF BODY")
+            print(body)
+            print(parsed_data)
+            print(parsed_data.get("conversationId"))
+            print("TESTING PARSING OF BODY")
             conversation_id = parsed_data.get("conversationId")
             author = parsed_data.get("author")
             data = parsed_data.get("data")
