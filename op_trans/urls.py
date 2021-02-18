@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
 from django.urls import re_path
@@ -10,4 +12,4 @@ urlpatterns = [
     re_path('info/?$', views.info, name="info"),
     re_path('mutations/?$', views.mutations, name="mutations"),
     re_path('conversations/?$', views.conversations, name="conversations"),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
