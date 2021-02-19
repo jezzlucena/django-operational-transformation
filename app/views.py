@@ -65,7 +65,7 @@ def _operational_transfrosmation(last_mutation, current_mutation):
     data = current_mutation.data
 
     # Make a copy of all values in the current mutation to avoid changing
-    # important data in the conversation database 
+    # important data in the conversation database
     new_mutation = Mutation(
         author=current_mutation.author,
         conversation=current_mutation.conversation,
@@ -79,7 +79,7 @@ def _operational_transfrosmation(last_mutation, current_mutation):
     # the new mutation's index
     if last_data["type"] == "insert" and data["index"] >= last_data["index"]:
         new_mutation.data["index"] += len(last_data["text"])
-    
+
     # Otherwise, if last mutation was a deletion
     elif last_data["type"] == "delete":
         last_index = last_data["index"]
@@ -92,10 +92,10 @@ def _operational_transfrosmation(last_mutation, current_mutation):
 
         # Otherwise if the new mutation is being attempted at a greater index
         # than last deletion index+length;
-        # then Subtract last mutation's length from the new index 
+        # then Subtract last mutation's length from the new index
         elif new_mutation.data["index"] >= last_index + last_length:
             new_mutation.data["index"] -= last_length
-    
+
     return new_mutation
 
 
@@ -113,7 +113,7 @@ def mutations(request):
                 raise Exception("invalid conversation ID")
 
             conversation, _ = Conversation.objects.get_or_create(identifier=conversation_id)
-            
+
             data_length = data.get("length", None)
             data_text = data.get("text", None)
             mutation = Mutation(
@@ -143,50 +143,27 @@ def mutations(request):
             last_mutation = Mutation.objects.filter(
                 conversation=conversation).last()
             if last_mutation is not None:
-                conflict_origin = origin.copy()
-                if conflict_origin[author] > 0:
-                    conflict_origin[author] -= 1
-                
-                if conflict_origin == last_mutation.origin:
-                    mutation.origin = conflict_origin
+                if origin == last_mutation.origin:
+                    mutation.origin = origin
                     mutation = _operational_transfrosmation(last_mutation, mutation)
                 else:
                     conflict_mutation = Mutation.objects.filter(
                         conversation=conversation,
-                        origin__contains=conflict_origin).first()
+                        origin__contains=origin).first()
 
                     if conflict_mutation is not None:
-                        mutation.origin = conflict_origin
                         conflict_candidates = Mutation.objects.filter(
                             conversation=conversation,
                             id__gt=conflict_mutation.id)
                         all_conflicts = [conflict_mutation] + list(conflict_candidates)
 
                         for old_mutation in all_conflicts:
-                            # if old_mutation.origin != mutation.origin:
-                            #     return JsonResponse({
-                            #         "ok": False,
-                            #         "text": conversation.text,
-                            #         "msg": "Origin outside conversation boundaries",
-                            #     }, status=201)
                             mutation = _operational_transfrosmation(old_mutation, mutation)
-                            print(mutation.origin)
             elif not all(v == 0 for v in origin.values()):
                 return JsonResponse({
                     "ok": False,
                     "msg": "Origin outside conversation boundaries",
                 }, status=201)
-
-            #     last_mutation = Mutation.objects.filter(
-            #         conversation=conversation).last()
-            #     if last_mutation:
-            #         expected_origin = last_mutation.origin.copy()
-            #         expected_origin[last_mutation.author] += 1
-            #         if expected_origin != origin:
-            #             return JsonResponse({
-            #                 "ok": False,
-            #                 "msg": "Origin outside conversation boundaries",
-            #             }, status=201)
 
             new_text = _apply_mutation(mutation, conversation.text)
             conversation.text = new_text
@@ -230,17 +207,18 @@ def conversations(request):
         })
     elif request.method == 'DELETE':
         try:
-            Conversation.objects.get(identifier=request.DELETE.get("conversationId"))
+            conversation_id = json.loads(request.body).get("conversationId")
+            Conversation.objects.filter(identifier=conversation_id).delete()
         except Exception as err:
             print(traceback.format_exc())
             return JsonResponse({
-                "msg": "Conversation not found", 
+                "msg": "Conversation not found",
                 "ok": False,
             }, status=200)
-        
+
         return JsonResponse({
             "ok": True,
         })
-    
+
     return HttpResponseNotAllowed(['GET', 'DELETE'])
 

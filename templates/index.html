@@ -3,22 +3,288 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="A RESTful API and UI implementating of the Operational Transaction algorithm. Python, Django, jQuery, Bootstrap, CSS3, and ES6 are some of the technolgies used in this project.">
+  <meta name="description" content="A RESTful API and UI implementating of the Operational Transformation algorithm. Python, Django, jQuery, Bootstrap, CSS3, and ES6 are some of the technolgies used in this project.">
+  <meta name="author" content="Jezz Lucena">
 
-  <title>django-operational-transaction</title>
+  <title>Operational Transformation</title>
 
   <!-- Bootstrap core CSS -->
-  <link rel="stylesheet" href="staticfiles/css/bootstrap.css">
-  <link rel="stylesheet" href="staticfiles/css/jquery-min.css">
-  <link rel="stylesheet" href="staticfiles/css/jquery-ui.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/featherlight/1.7.13/featherlight.min.css" integrity="sha512-56GJrpSgHk6Mc9Fltt+bQKcICJoEpxtvozXPA5n5OT0rfWiqGlJmJCI/vl16kctf/0XbBloh03vl7OF2xFnR8g==" crossorigin="anonymous" />
+
+  <style>
+    /* Despite using Bootstrap for the styling, I decided to make
+       some small changes to the page stylesheet */
+    html, body {
+      min-height: 100%;
+      height: 100%;
+      background-color: azure;
+    }
+
+    .container {
+      min-height: 100%;
+      height: 100%;
+    }
+
+    .spinner-border {
+      height: 1em;
+      width: 1em;
+      border-width: 0.15em;
+    }
+
+    i {
+      cursor: pointer;
+    }
+
+    i.star.starred {
+      color: darkgoldenrod;
+    }
+  </style>
 </head>
 <body>
-  <h3>Conversations</h3>
+  <div class="container py-5">
+    <div class='row justify-content-center'>
+      <div class="col-10 shadow-lg py-5 px-5 bg-white rounded">
+        <h3>
+          <span class="mr-2">Conversations</span>
+          <span class="conversations-spinner spinner-border" role="status">
+            <span class="sr-only">Loading...</span>
+          </span>
+          <i class="update-icon fa fa-refresh fa-sm mr-2" style="display: none;"></i>
+        </h3>
 
-  <script src="staticfiles/js/external/jquery-3.3.1.js"></script>
-  <script src="staticfiles/js/external/jquery-ui-1.12.1.js"></script>
-  <script src="staticfiles/js/external/bootstrap.js"></script>
+        <table class="conversations-table table mt-5" style="display: none;">
+          <thead>
+            <tr>
+              <th scope="col id" style="width:  10%">Id</th>
+              <th scope="col text" style="width:  50%">Text</th>
+              <th scope="col lastMutation" style="width:  30%">Last Mutation</th>
+              <th scope="col actions" style="width:  10%"></th>
+            </tr>
+          </thead>
+          <tbody id="conversationsContainer">
+          </tbody>
+          <tr id="conversationTemplateElem" class="d-none">
+            <th scope="row" class="id"></th>
+            <td class="text"></td>
+            <td class="lastMutation">
+              <pre></pre>
+            </td>
+            <td class="actions text-nowrap">
+              <i class="open fa fa-comments fa-lg mr-2"></i>
+              <i class="star fa fa-star fa-lg mr-2"></i>
+              <i class="delete fa fa-trash fa-lg"></i>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
 
-  <script src="staticfiles/js/main.js'"></script>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/featherlight/1.7.13/featherlight.min.js" integrity="sha512-0UbR6HN0dY8fWN9T7fF658896tsPgnbRREHCNq46J9/JSn8GonXDZmqtTc3qS879GM0zV49b9LPhdc/maKP8Kg==" crossorigin="anonymous"></script>
+
+  <input id="conversations_url" type="hidden" value="{% url 'conversations' %}"/>
+
+  <script>
+    // ConversationManager is a singleton javascript object
+    // that handles all the frontend logic
+    const ConversationManager = new function() {
+      const self = this;
+
+      // Initialize ConversationManager, animations, event handlers, etc.
+      this.init = () => {
+        self.initVariables();
+        self.retrieveConversations();
+        $(".conversations-table").fadeOut(500);
+
+        $(".update-icon").click(() => {
+          $(".update-icon, .conversations-table").fadeOut(500, () => {
+            $("#conversationsContainer").html("");
+            self.retrieveConversations();
+            self.markedForUpdate = true;
+            $(".spinner-border").fadeIn(500);
+          });
+        })
+      };
+
+      // Initialize relevant variables and jquery elements
+      this.initVariables = () => {
+        self.conversationsUrl = $("#conversations_url").val();
+        self.conversationsDict = {};
+        self.markedForUpdate = true;
+      };
+
+      // Retrieve all conversations from the database
+      this.retrieveConversations = () => {
+        $.ajax({
+          type: "GET",
+          url: self.conversationsUrl,
+          success: function(data) {
+            $(".spinner-border").fadeOut(500, () => {
+              $(".update-icon").fadeIn(500);
+            });
+
+            if (!data.conversations || data.conversations.length == 0) {
+              $(".conversations-table").fadeOut(500);
+              clearTimeout(self.updateTimeout);
+              self.updateTimeout = undefined;
+            } else {
+              self.conversationsDict = Object.assign({}, ...data.conversations.map((x) => ({[x.id]: x})));
+              if (self.markedForUpdate) {
+                self.renderConversations(data.conversations);
+              }
+            }
+          }
+        }).then(() => {
+          self.markedForUpdate = false;
+          self.updateTimeout = setTimeout(() => {
+            if (!!self.currentConversationId) {
+              self.retrieveConversations();
+              self.renderConversation(self.currentConversationId);
+            }
+          }, 1000);
+        });
+      };
+
+      // Render all conversations passed in a given array
+      this.renderConversations = conversations => {
+        const conversationTemplateElem = $("#conversationTemplateElem");
+
+        // Iterate through all conversation creating clones of the conversation template
+        if (conversations && conversations.length > 0) {
+          conversations.forEach(conversation => {
+            const newConversation = $(conversationTemplateElem).clone();
+            newConversation.find(".id").text(conversation.id);
+            newConversation.find(".text").text(conversation.text);
+
+            // If a last mutation is present, format the data into a pretty string
+            // show in a <pre/> html element
+            if (conversation.lastMutation) {
+              let typeOrLengthCopy = "";
+              if (conversation.lastMutation.data.type == "insert") {
+                typeOrLengthCopy = `inserted "${conversation.lastMutation.data.text}" to`
+              } else if (conversation.lastMutation.data.type == "delete") {
+                typeOrLengthCopy = `deleted ${conversation.lastMutation.data.length} characters from`
+              }
+
+              let authors = Object.keys(conversation.lastMutation.origin);
+              const originArr = [];
+              authors.forEach(author => {
+                originArr.push(`${author}:${conversation.lastMutation.origin[author]}`)
+              })
+              newConversation.find(".lastMutation pre")
+                .text(`${conversation.lastMutation.author} ${typeOrLengthCopy} index ${conversation.lastMutation.data.index}\n(origin = ${originArr.join(", ")})`);
+            }
+
+            // Attach click handlers for opening the lightbox with updating conversation
+            newConversation.find("i.open").click(function() {
+              self.currentConversationId = conversation.id;
+              const currentConversationElem = $("<pre class='conversationModal'/>");
+              currentConversationElem.attr("data-conversation-id", conversation.id);
+
+              $.featherlight(currentConversationElem, {
+                afterClose: () => {
+                  self.currentConversationId = undefined;
+                }
+              });
+
+              self.renderConversation();
+            });
+
+            // Show favorites depending on cookies
+            const isStarred = self.readCookie(conversation.id);
+            console.log(newConversation.find("i.star"))
+            newConversation.find("i.star").toggleClass("starred", !!isStarred)
+              .attr("data-conversation-id", conversation.id)
+              .click(function() {
+                $(this).toggleClass("starred");
+                const conversationId = $(this).attr("data-conversation-id");
+                if ($(this).hasClass("starred")) {
+                  self.setCookie(conversationId, "true");
+                } else {
+                  self.eraseCookie(conversationId);
+                }
+              });
+
+            // Attach click handlers to the delete button
+            newConversation.find("i.delete").click(() => {
+              self.deleteConversation(conversation.id)
+                .then(() => {
+                  console.log($("#conversationTemplateElem:not(.d-none)").length == 1)
+                  if ($("#conversationTemplateElem:not(.d-none)").length == 0) {
+                    $(".conversations-table").fadeOut(500);
+                  }
+                  newConversation.fadeOut(500, () => {
+                    newConversation.remove();
+                  });
+                });
+            });
+
+            newConversation.appendTo($("#conversationsContainer"));
+            newConversation.removeClass("d-none");
+          });
+
+          $(".conversations-table").fadeIn(500);
+        } else {
+          // If no conversations were passed, fade out the entire table
+          $(".conversations-table").fadeOut(500);
+        }
+      };
+
+      // Render the currently selected conversation in the lightbox
+      this.renderConversation = () => {
+        $(".featherlight-content pre").html(
+          `Conversation Id: ${self.currentConversationId}\n\n${self.conversationsDict[self.currentConversationId].text}`);
+      };
+
+      // Delete a conversation based on a certain conversation id
+      this.deleteConversation = (conversationId) => {
+        return $.ajax({
+          type: "DELETE",
+          data: JSON.stringify({ conversationId }),
+          url: self.conversationsUrl,
+          success: function(data) {
+            console.log(data);
+          }
+        });
+      };
+
+      // Cookie logic taken from https://stackoverflow.com/questions/1599287/create-read-and-erase-cookies-with-jquery
+      this.setCookie = (name, value) => {
+        var date = new Date();
+        date.setTime(date.getTime() + (30 * 24 * 60 * 60 * 1000));
+        // Set cookie valid for 30 days
+        var expires = "; expires=" + date.toGMTString();
+        document.cookie = name + "=" + value + expires + "; path=/";
+      }
+
+      // Read a given key from the local cookie
+      this.readCookie = (name) => {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for (var i = 0; i < ca.length; i++) {
+          var c = ca[i];
+          while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+          if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+        }
+        return null;
+      }
+
+      // Erase a given key from the local cookie
+      this.eraseCookie = (name) => {
+        self.setCookie(name, "", -1);
+      }
+    };
+
+    // Initialize ConversationManager when the DOM is fully rendered
+    $(document).ready(() => {
+      ConversationManager.init();
+    });
+  </script>
 </body>
 </html>
