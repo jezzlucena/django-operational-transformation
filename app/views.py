@@ -36,14 +36,14 @@ def info(request):
             "name": "Jezz Lucena"
         },
         "frontend": {
-            "url": "https://op-trans.herokuapp.com"
+            "url": "https://op-trans.herokuapp.com/"
         },
         "language": "python",
         "sources": "https://github.com/jezzlucena/django-operational-transformation",
         "answers": {
-            "1": "",
-            "2": "",
-            "3": ""
+            "1": "I approached this challenge in 4 phases, in the following order of priority:\n\n\t1) Study the Operational Transformation algorithm so I can make informed architectural decisions;\n\t2) Set up a robust RESTful API using Django, Python, and PostgreSQL, along with a GitHub repository and a Heroku app that ;\n    3) Implement a (very) simple front-end app in the same Django project, using Bootstrap, Font Awesome, jQuery, CSS3, ES6, among some other tools. (by the way, I feel like this was my most hacky / least polished stab at this challenge - my most sincere apologies);\n\t4) Write up the very post-mortem testimonials you are reading right now.",
+            "2": "If I had more time to work on this coding challenge, I would first solve the last mutation conflict resolution issues that I haven't been able to tackle; and second I would boost up the front end with a proper UI framerowk like Vue or React, plus a standardized design library like Google's Material Design (albeit this part would require some extra work on ensuring static files are properly served on AWS or a similar service - heroku is not the best at accomplishing this task).",
+            "3": "This is complicated question to answer, but here I go:\nMy first instinct is to say that the time estimated to complete this task (6h) is not sufficient to deliver a code-complete solution that includes a concise architecture and build stack - I would estimate this task as a 16-to-20h job to reach production-level robustness.\nThat said, I have recognize that one of the most interesting parts of hiring is understanding how an engineer handles work under high-pressure circumstances, tight deadlines, and in that sense I believe there was just enough time. Maybe instead of extending the deadline, I would offer some extra boilerplate resources to ease out the engineer's issues with technicalities (e.g. setting up hosting services, dealing with CORS, ). When I have the opportunity to do recruiting, this has proven to be a great way to see through time and technical constraints - enabling me to take a closer look at the engineer's problem-solving approach and architectural/design abilities. Finally, I would say this suggestion is very dependent on role, team size, and stack."
         }
     })
 
