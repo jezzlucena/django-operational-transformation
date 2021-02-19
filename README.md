@@ -6,15 +6,20 @@ https://op-trans.herokuapp.com/
 
 # RESTful API
 
-## GET /ping
+### GET /ping
+
 Response:
+```
 200 {
   "ok": true,
   "msg": "pong"
 }
+```
 
-## GET /info
+### GET /info
+
 Response:
+```
 200 {
   "ok": true,
   "author": {
@@ -32,9 +37,12 @@ Response:
     "3": "string, answer to the question 3"
   }
 }
+```
 
-## POST /mutations
+### POST /mutations
+
 Body:
+```
 {
   "author": "alice | bob",
   "conversationId": "string",
@@ -49,16 +57,21 @@ Body:
     "bob": "integer"
   }
 }
+```
 
 Response:
+```
 201 {
   "msg": "an error message, if needed",
   "ok": "boolean",
   "text": "string, the current text of the conversation, after applying the mutation"
 }
+```
 
-## GET /conversations
+### GET /conversations
+
 Response:
+```
 200 {
   "conversations": [
     {
@@ -71,18 +84,24 @@ Response:
   "msg": "string, an error message, if needed",
   "ok": "boolean"
 }
+```
 
+### DELETE /conversations
 
-## DELETE /conversations
 Response:
+```
 204 {
   "msg": "string, an error message, if needed",
   "ok": "boolean"
 }
+```
 
-## GET /reset
+### GET /reset
+
 Response:
+```
 200 {
   "ok": true,
   "msg": "pong"
 }
+```
