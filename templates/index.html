@@ -198,7 +198,6 @@
 
             // Show favorites depending on cookies
             const isStarred = self.readCookie(conversation.id);
-            console.log(newConversation.find("i.star"))
             newConversation.find("i.star").toggleClass("starred", !!isStarred)
               .attr("data-conversation-id", conversation.id)
               .click(function() {
@@ -215,7 +214,6 @@
             newConversation.find("i.delete").click(() => {
               self.deleteConversation(conversation.id)
                 .then(() => {
-                  console.log($("#conversationTemplateElem:not(.d-none)").length == 1)
                   if ($("#conversationTemplateElem:not(.d-none)").length == 0) {
                     $(".conversations-table").fadeOut(500);
                   }
