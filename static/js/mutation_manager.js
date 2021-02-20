@@ -6,17 +6,6 @@ var MutationManager = MutationManager || new function() {
   // Initialize MutationManager, animations, event handlers, etc.
   this.init = () => {
     self.initVariables();
-    self.retrieveConversations();
-    $(".conversations-table").fadeOut(500);
-
-    $(".update-icon").click(() => {
-      $(".update-icon, .conversations-table").fadeOut(500, () => {
-        $("#conversationsContainer").html("");
-        self.retrieveConversations();
-        self.markedForUpdate = true;
-        $(".spinner-border").fadeIn(500);
-      });
-    })
   };
 
   // Initialize relevant variables and jquery elements

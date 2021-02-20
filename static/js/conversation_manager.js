@@ -22,13 +22,8 @@ var ConversationManager = ConversationManager || new function() {
   // Initialize relevant variables and jquery elements
   this.initVariables = () => {
     self.conversationsUrl = $("#conversations_url").val();
-    self.mutationsUrl = $("#mutations_url").val();
     self.conversationsDict = {};
     self.markedForUpdate = true;
-
-    self.currentConversationId = "1234567890";
-    self.currentAuthor = "bob";
-    self.currentOrigin = { bob: 0, alice: 0 };
   };
 
   // Retrieve all conversations from the database
@@ -47,7 +42,7 @@ var ConversationManager = ConversationManager || new function() {
           self.updateTimeout = undefined;
         } else {
           self.conversationsDict = Object.assign({}, ...data.conversations.map((x) => ({[x.id]: x})));
-          if (self.markedForUpdate) {
+          if (!$.isEmptyObject(self.conversationsDict) && self.markedForUpdate) {
             self.renderConversations(data.conversations);
           }
         }
@@ -55,10 +50,8 @@ var ConversationManager = ConversationManager || new function() {
     }).then(() => {
       self.markedForUpdate = false;
       self.updateTimeout = setTimeout(() => {
-        if (!!self.currentConversationId) {
-          self.retrieveConversations();
-          self.renderConversation(self.currentConversationId);
-        }
+        self.retrieveConversations();
+        self.renderConversation(self.currentConversationId);
       }, 1000);
     });
   };
@@ -77,8 +70,6 @@ var ConversationManager = ConversationManager || new function() {
         // If a last mutation is present, format the data into a pretty string
         // show in a <pre/> html element
         if (conversation.lastMutation) {
-          self.currentOrigin = conversation.lastMutation.origin;
-
           let typeOrLengthCopy = "";
           if (conversation.lastMutation.data.type == "insert") {
             typeOrLengthCopy = `inserted "${conversation.lastMutation.data.text}" to`
@@ -150,8 +141,11 @@ var ConversationManager = ConversationManager || new function() {
 
   // Render the currently selected conversation in the lightbox
   this.renderConversation = () => {
-    $(".featherlight-content pre").html(
-      `Conversation Id: ${self.currentConversationId}\n\n${self.conversationsDict[self.currentConversationId].text}`);
+    const currentConversation = self.conversationsDict[self.currentConversationId];
+    if (!!self.currentConversationId && !!currentConversation) {
+      $(".featherlight-content pre").html(
+        `Conversation Id: ${self.currentConversationId}\n\n${currentConversation.text}`);
+    }
   };
 
   // Delete a conversation based on a certain conversation id
