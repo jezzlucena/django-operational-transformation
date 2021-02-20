@@ -19,6 +19,10 @@ i {
   cursor: pointer;
 }
 
+i.star {
+  transition: 0.2s color ease;
+}
+
 i.star.starred {
   color: darkgoldenrod;
 }
