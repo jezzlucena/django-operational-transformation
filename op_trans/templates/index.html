@@ -1,0 +1,74 @@
+{% load static %}
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="A RESTful API and UI implementating of the Operational Transformation algorithm. Python, Django, jQuery, Bootstrap, CSS3, and ES6 are some of the technolgies used in this project.">
+  <meta name="author" content="Jezz Lucena">
+
+  <title>Operational Transformation</title>
+
+  <link rel="stylesheet" type="text/css" href="{% static 'css/external/featherlight-1.7.13.min.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/external/bootstrap-4.5.2.min.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/external/fontawesome-5.15.2.min.css' %}">
+
+  <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}">
+
+</head>
+<body>
+  <div class="container py-5">
+    <div class='row justify-content-center'>
+      <div class="col-10 shadow-lg py-5 px-5 bg-white rounded">
+        <h3>
+          <span class="mr-2">Conversations</span>
+          <span class="conversations-spinner spinner-border" role="status">
+            <span class="sr-only">Loading...</span>
+          </span>
+          <i class="update-icon fas fa-sync fa-sm mr-2" style="display: none;"></i>
+        </h3>
+
+        <table class="conversations-table table mt-5" style="display: none;">
+          <thead>
+            <tr>
+              <th scope="col id" style="width:  10%">Id</th>
+              <th scope="col text" style="width:  50%">Text</th>
+              <th scope="col lastMutation" style="width:  30%">Last Mutation</th>
+              <th scope="col actions" style="width:  10%"></th>
+            </tr>
+          </thead>
+          <tbody id="conversationsContainer">
+          </tbody>
+          <tr id="conversationTemplateElem" class="d-none">
+            <th scope="row" class="id"></th>
+            <td class="text"></td>
+            <td class="lastMutation">
+              <pre></pre>
+            </td>
+            <td class="actions text-nowrap">
+              <i class="open fas fa-comments fa-lg mr-2"></i>
+              <i class="star fas fa-star fa-lg mr-2"></i>
+              <i class="delete fas fa-trash fa-lg"></i>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="{% static 'js/external/jquery-3.3.1.min.js' %}"></script>
+  <script src="{% static 'js/external/jquery-ui-1.12.1.min.js' %}"></script>
+  <script src="{% static 'js/external/bootstrap-4.1.0.min.js' %}"></script>
+  <script src="{% static 'js/external/featherlight-1.7.13.min.js' %}"></script>
+
+  <script src="{% static 'js/cookie_manager.js' %}"></script>
+  <script src="{% static 'js/conversation_manager.js' %}"></script>
+  <script src="{% static 'js/mutation_manager.js' %}"></script>
+  <script src="{% static 'js/base.js' %}"></script>
+
+  <input id="conversations_url" type="hidden" value="{% url 'conversations' %}"/>
+  <input id="mutations_url" type="hidden" value="{% url 'mutations' %}"/>
+</body>
+</html>

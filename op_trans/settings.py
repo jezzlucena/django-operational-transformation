@@ -40,8 +40,15 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATIC_URL = '/staticfiles/'
+STATIC_URL = '/static/'
+STATICFILES_DIRS = (str(os.path.join(BASE_DIR, 'static')),)
+
+STATIC_ROOT = ''
+
+STATICFILES_FINDERS = [
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+]
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
@@ -56,6 +63,7 @@ ALLOWED_HOSTS = [
     "*"
 ]
 
+WSGI_APPLICATION = 'op_trans.wsgi.application'
 CORS_ALLOWED_ORIGINS = [
     "https://127.0.0.1",
     "https://localhost",
@@ -72,7 +80,6 @@ CORS_ALLOWED_ORIGINS = [
 # Application definition
 
 INSTALLED_APPS = [
-    'app.apps.AppConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -80,6 +87,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
+    'app',
+    'op_trans',
 ]
 
 MIDDLEWARE = [
@@ -94,7 +103,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'op_trans.urls'
+ROOT_URLCONF = 'app.urls'
 
 TEMPLATES = [
     {
@@ -112,7 +121,6 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'op_trans.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
