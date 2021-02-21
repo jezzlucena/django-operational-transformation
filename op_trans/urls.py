@@ -13,4 +13,4 @@ urlpatterns = [
     url(r'^mutations/$', app_views.mutations, name="mutations"),
     url(r'^conversations/$', app_views.conversations, name="conversations"),
     url(r'^$', op_trans_views.index, name="home"),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
