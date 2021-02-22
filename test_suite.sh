@@ -1,7 +1,7 @@
-curl -X POST -H "Content-Type: application/json" -d '{"author":"bob","conversationId":"1613685297602","data":{"type":"insert","index":0,"text":"The"},"origin":{"bob":0,"alice":0}}' localhost:8000/mutations/
-curl -X POST -H "Content-Type: application/json" -d '{"author":"bob","conversationId":"1613685297602","data":{"type":"insert","index":3,"text":" house"},"origin":{"bob":1,"alice":0}}' localhost:8000/mutations/
-curl -X POST -H "Content-Type: application/json" -d '{"author":"bob","conversationId":"1613685297602","data":{"type":"insert","index":9,"text":" is"},"origin":{"bob":2,"alice":0}}' localhost:8000/mutations/
-curl -X POST -H "Content-Type: application/json" -d '{"author":"bob","conversationId":"1613685297602","data":{"type":"insert","index":12,"text":" red."},"origin":{"bob":3,"alice":0}}' localhost:8000/mutations/
-curl -X POST -H "Content-Type: application/json" -d '{"author":"alice","conversationId":"1613685297602","data":{"type":"delete","index":0,"length":3},"origin":{"bob":2,"alice":0}}' localhost:8000/mutations/
-curl -X POST -H "Content-Type: application/json" -d '{"author":"alice","conversationId":"1613685297602","data":{"type":"insert","index":0,"text":"THE"},"origin":{"bob":2,"alice":1}}' localhost:8000/mutations/
-curl -X POST -H "Content-Type: application/json" -d '{"author":"bob","conversationId":"1613685297602","data":{"type":"insert","index":13,"text":" and blue"},"origin":{"bob":4,"alice":1}}' localhost:8000/mutations/
+curl -X POST -H "Content-Type: application/json" -d '{"author":"bob","conversationId":"1613685297602","data":{"type":"insert","index":0,"text":"The"},"origin":{"bob":0,"alice":0}}' localhost:8000/api/mutations/
+curl -X POST -H "Content-Type: application/json" -d '{"author":"bob","conversationId":"1613685297602","data":{"type":"insert","index":3,"text":" house"},"origin":{"bob":1,"alice":0}}' localhost:8000/api/mutations/
+curl -X POST -H "Content-Type: application/json" -d '{"author":"bob","conversationId":"1613685297602","data":{"type":"insert","index":9,"text":" is"},"origin":{"bob":2,"alice":0}}' localhost:8000/api/mutations/
+curl -X POST -H "Content-Type: application/json" -d '{"author":"bob","conversationId":"1613685297602","data":{"type":"insert","index":12,"text":" red."},"origin":{"bob":3,"alice":0}}' localhost:8000/api/mutations/
+curl -X POST -H "Content-Type: application/json" -d '{"author":"alice","conversationId":"1613685297602","data":{"type":"delete","index":0,"length":3},"origin":{"bob":2,"alice":0}}' localhost:8000/api/mutations/
+curl -X POST -H "Content-Type: application/json" -d '{"author":"alice","conversationId":"1613685297602","data":{"type":"insert","index":0,"text":"THE"},"origin":{"bob":2,"alice":1}}' localhost:8000/api/mutations/
+curl -X POST -H "Content-Type: application/json" -d '{"author":"bob","conversationId":"1613685297602","data":{"type":"insert","index":13,"text":" and blue"},"origin":{"bob":4,"alice":1}}' localhost:8000/api/mutations/

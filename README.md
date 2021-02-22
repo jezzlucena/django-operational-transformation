@@ -1,2 +1,175 @@
 # django-operational-transformation
 A boilerplate Opperational Transformation implementation using Django, Bootstrap, and jQuery to provide interface
+
+# Live Demo
+https://op-trans.herokuapp.com/
+
+# RESTful API
+
+### GET /ping
+
+Response:
+```
+200 {
+  "ok": true,
+  "msg": "pong"
+}
+```
+
+### GET /info
+
+Response:
+```
+200 {
+  "ok": true,
+  "author": {
+    "email": "string",
+    "name": "string"
+  },
+  "frontend": {
+    "url": "string, the url of your frontend."
+  },
+  "language": "node.js | python",
+  "sources": "string, the url of a github repository including your backend sources and your frontend sources",
+  "answers": {
+    "1": "string, answer to the question 1",
+    "2": "string, answer to the question 2",
+    "3": "string, answer to the question 3"
+  }
+}
+```
+
+### POST /mutations
+
+Body:
+```
+{
+  "author": "alice | bob",
+  "conversationId": "string",
+  "data": {
+    "index": "number",
+    "length": "number | undefined",
+    "text": "string | undefined",
+    "type": "insert | delete"
+  },
+  "origin": {
+    "alice": "integer",
+    "bob": "integer"
+  }
+}
+```
+
+Response:
+```
+201 {
+  "msg": "an error message, if needed",
+  "ok": "boolean",
+  "text": "string, the current text of the conversation, after applying the mutation"
+}
+```
+
+### GET /conversations
+
+Response:
+```
+200 {
+  "conversations": [
+    {
+      "id": "string",
+      "lastMutation": "Object, The last mutation applyed on this conversation",
+      "text": "string"
+    },
+    "..."
+  ],
+  "msg": "string, an error message, if needed",
+  "ok": "boolean"
+}
+```
+
+### DELETE /conversations
+
+Response:
+```
+204 {
+  "msg": "string, an error message, if needed",
+  "ok": "boolean"
+}
+```
+
+### GET /reset
+
+Response:
+```
+200 {
+  "ok": true,
+  "msg": "pong"
+}
+```
+
+# React App (react-ui)
+## Available Scripts
+
+In the project directory, you can run:
+
+### `npm start`
+
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+
+The page will reload if you make edits.\
+You will also see any lint errors in the console.
+
+### `npm test`
+
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+
+### `npm run build`
+
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
+
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
+
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+
+### `npm run eject`
+
+**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+
+If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+
+You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+
+## Learn More
+
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+
+To learn React, check out the [React documentation](https://reactjs.org/).
+
+### Code Splitting
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+
+### Analyzing the Bundle Size
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+
+### Making a Progressive Web App
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+
+### Advanced Configuration
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+
+### Deployment
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+
+### `npm run build` fails to minify
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)

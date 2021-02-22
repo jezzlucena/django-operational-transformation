@@ -1,0 +1,17 @@
+
+pre {
+    white-space: pre-wrap;
+}
+
+.btn-icon {
+    cursor: pointer;
+}
+
+.btn-icon [data-icon="star"] {
+    transition: 0.5s color ease;
+}
+
+.btn-icon [data-icon="star"].starred {
+    color: darkgoldenrod;
+    transition: 0.1s color ease;
+}

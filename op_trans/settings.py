@@ -35,18 +35,23 @@ CORS_ALLOW_HEADERS = [
     'x-requested-with',
 ]
 
+CSRF_COOKIE_NAME = "XSRF-TOKEN"
+
 SECRET_KEY = os.getenv('SECRET_KEY', 'Optional default value')
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+REACT_APP_DIR = BASE_DIR
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATIC_URL = '/static/'
+STATIC_URL = '/staticfiles/'
 
-# Extra places for collectstatic to find static files.
-STATICFILES_DIRS = (
-    str(os.path.join(BASE_DIR, 'static')),
-)
+STATICFILES_DIRS = [
+    os.path.join(REACT_APP_DIR, 'build', 'static'),
+    os.path.join(BASE_DIR, 'static'),
+]
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.FileSystemFinder',
@@ -68,16 +73,11 @@ ALLOWED_HOSTS = [
 
 WSGI_APPLICATION = 'op_trans.wsgi.application'
 CORS_ALLOWED_ORIGINS = [
-    "https://127.0.0.1",
-    "https://localhost",
     "https://app.ava.me",
     "https://avahq.github.io",
     "https://ava-challenge-test-backend.herokuapp.com",
     "http://127.0.0.1",
     "http://localhost",
-    "http://app.ava.me",
-    "http://avahq.github.io",
-    "http://ava-challenge-test-backend.herokuapp.com",
 ]
 
 # Application definition
@@ -95,23 +95,28 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 ROOT_URLCONF = 'app.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'templates'),
+            os.path.join(BASE_DIR, 'static/build')
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
